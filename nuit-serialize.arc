@@ -1,11 +1,11 @@
 (import re)
 
-(= nuit-complex "(?:^[@>\"#])|\n|^$")
+(var nuit-complex "(?:^[@>\"#])|\n|^$")
 
 ; TODO fix this name
-(= nuit-invalid-foo "([\u0009\u000B\u000C\u0085\u00A0\u1680\u180E\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\u0000-\u0008\u000E-\u001F\u007F-\u0084\u0086-\u009F\uFDD0-\uFDEF\uFFFE\uFFFF])|(?:([\\s\\S]\uFEFF))")
+(var nuit-invalid-foo "([\u0009\u000B\u000C\u0085\u00A0\u1680\u180E\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\u0000-\u0008\u000E-\u001F\u007F-\u0084\u0086-\u009F\uFDD0-\uFDEF\uFFFE\uFFFF])|(?:([\\s\\S]\uFEFF))")
 
-(= nuit-indent 2)
+(var nuit-indent 2)
 
 (def nuit-simple (x)
   (and (isa x 'string)

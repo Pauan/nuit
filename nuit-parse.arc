@@ -1,11 +1,11 @@
 (import re)
 
-(= nuit-whitespace   (string "\u9\uB\uC\u85\uA0\u1680\u180E\u2000-\u200A"
-                             "\u2028\u2029\u202F\u205F\u3000")
-   nuit-nonprinting  (string "\u0-\u8\uE-\u1F\u7F-\u84\u86-\u9F\uFDD0-\uFDEF"
-                             "\uFEFF\uFFFE\uFFFF\U1FFFE\U1FFFF\U10FFFE\U10FFFF")
-   nuit-end-of-line  "(?:\uD\uA|[\uD\uA]|$)"
-   nuit-invalid      (string nuit-whitespace nuit-nonprinting))
+(var nuit-whitespace   (string "\u9\uB\uC\u85\uA0\u1680\u180E\u2000-\u200A"
+                               "\u2028\u2029\u202F\u205F\u3000")
+     nuit-nonprinting  (string "\u0-\u8\uE-\u1F\u7F-\u84\u86-\u9F\uFDD0-\uFDEF"
+                               "\uFEFF\uFFFE\uFFFF\U1FFFE\U1FFFF\U10FFFE\U10FFFF")
+     nuit-end-of-line  "(?:\uD\uA|[\uD\uA]|$)"
+     nuit-invalid      (string nuit-whitespace nuit-nonprinting))
 
 (def f-err (message line lines column)
   (let column (if (< column 1)
@@ -66,6 +66,8 @@
   (nuit-while s 0
     (fn (self s lines i str)
       (when (and index (>= i index)) i))))
+
+(var nuit-parsers)
 
 ;; Returns a function that is suitable for passing to `nuit-while`
 ;;
@@ -167,38 +169,38 @@
     (list sep string.x)))
 
 (= nuit-parsers
-   (obj #\@ (fn (next s lines i str)
-              (let (first space rest) (cdr:re-match "^([^ ]*)( *)(.*)" str)
-                (let body (fn (s lines rest)
-                            (let index (nuit-find-indent i s)
-                              (nuit-while s lines
-                                (nuit-parse-index is index)
-                                (fn (s lines x)
-                                  (let x rest.x
-                                    (cons (if (is first "")
-                                              x
-                                              (cons first x))
-                                          (next s lines)))))))
-                  (if (is rest "")
-                      (body cdr.s (+ lines 1) idfn)
-                      (let i (+ i (len:string first space))
-                        (nuit-parse-inline s lines i rest
-                          (fn (s lines x)
-                            (if x
-                                (body s lines (fn (y) (cons car.x y)))
-                                (body s lines idfn)))))))))
-        #\# (fn (next s lines index str)
-              (nuit-while cdr.s (+ lines 1)
-                ;; Consumes all the lines that have an indent greater
-                ;; than or equal to `index`
-                (fn (self s lines i str)
-                  (when (>= i index)
-                    (self cdr.s (+ lines 1))))
-                ;; Calls `next` so that the value of # is ignored
-                (fn (s lines x)
-                  (next s lines))))
-        #\> (nuit-parse-string #\newline)
-        #\" (nuit-parse-string #\space nuit-parse-escape)))
+  (obj #\@ (fn (next s lines i str)
+             (let (first space rest) (cdr:re-match "^([^ ]*)( *)(.*)" str)
+               (let body (fn (s lines rest)
+                           (let index (nuit-find-indent i s)
+                             (nuit-while s lines
+                               (nuit-parse-index is index)
+                               (fn (s lines x)
+                                 (let x rest.x
+                                   (cons (if (is first "")
+                                             x
+                                             (cons first x))
+                                         (next s lines)))))))
+                 (if (is rest "")
+                     (body cdr.s (+ lines 1) idfn)
+                     (let i (+ i (len:string first space))
+                       (nuit-parse-inline s lines i rest
+                         (fn (s lines x)
+                           (if x
+                               (body s lines (fn (y) (cons car.x y)))
+                               (body s lines idfn)))))))))
+       #\# (fn (next s lines index str)
+             (nuit-while cdr.s (+ lines 1)
+               ;; Consumes all the lines that have an indent greater
+               ;; than or equal to `index`
+               (fn (self s lines i str)
+                 (when (>= i index)
+                   (self cdr.s (+ lines 1))))
+               ;; Calls `next` so that the value of # is ignored
+               (fn (s lines x)
+                 (next s lines))))
+       #\> (nuit-parse-string #\newline)
+       #\" (nuit-parse-string #\space nuit-parse-escape)))
 
 (def nuit-parse (s)
   (let s (nuit-normalize (if (isa s 'string)
