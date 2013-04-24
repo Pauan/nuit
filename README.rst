@@ -472,6 +472,6 @@ XML (807 bytes)::
 
 ----
 
-If you're after the smallest format, inline YAML wins by a *very* huge margin. Nuit and JSON are quite close to eachother. Indented YAML and XML are the worst of the bunch, by a fairly significant margin.
+If you're after the smallest format, inline YAML wins by a *very* huge margin. Nuit and JSON are quite close to each other. Indented YAML and XML are the worst of the bunch, by a fairly significant margin.
 
 If you use LF or CR rather than CR+LF then Nuit is 704 bytes and Indented YAML is 748 bytes.
