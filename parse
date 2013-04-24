@@ -1,0 +1,197 @@
+(var whitespace   (str "\u9\uB\uC\u85\uA0\u1680\u180E\u2000-\u200A"
+                       "\u2028\u2029\u202F\u205F\u3000")
+     nonprinting  (str "\u0-\u8\uE-\u1F\u7F-\u84\u86-\u9F\uFDD0-\uFDEF"
+                       "\uFEFF\uFFFE\uFFFF\U1FFFE\U1FFFF\U10FFFE\U10FFFF")
+     end-of-line  "(?:\uD\uA|[\uD\uA]|$)"
+     invalid      (str whitespace nonprinting))
+
+(def f-err (message x column)
+  (let column (if (< column 1)
+                  1
+                  column)
+    (err message "\n  "
+      (str (n-of (x "indent") #\space)) (x "text")
+      "  (line " (x "line") ", column " column ")\n"
+      " " (str (n-of column #\space)) "^")))
+
+(def normalize (s)
+  ;; Byte Order Mark may only appear at the start of the stream and is ignored
+  (re "^\uFEFF" s)
+  (alet line 1
+    (unless (eof? (peek s)) ; TODO maybe make eof count as false
+                 ;; Different line endings are converted to U+000A
+      (withs (x  (cadr (re (str "^([^\r\n]*)" end-of-line) s))
+                 ;; U+0020 at the end of the line is ignored
+              x  (re-replace " +$" x "")
+              x  (let (_ ind text) (re "^( *)(.*)$" x)
+                   (dict "indent" (len ind)
+                         "text"   text
+                         "line"   line))
+              y  (x "text"))
+                     ;; Invalid characters are not allowed anywhere
+        (iflet (pos) (re-pos (str "[" invalid "]") y)
+          (f-err (str "invalid character " (y pos)) x (+ pos 1))
+          (cons x (self (+ line 1))))))))
+
+(def empty (x)
+  (is (x "text") ""))
+
+(var iter nil)
+
+(def get-indented (f i)
+  (when (cons? iter)
+    (let x (car iter)
+      (when (or (empty x)
+                (f (x "indent") i))
+        (= iter (cdr iter))
+        (cons x (get-indented f i))))))
+
+(def first-indent ()
+  (when (cons? iter)
+    (if (empty (car iter))
+        (do (= iter (cdr iter))
+            (first-indent))
+        ((car iter) "indent"))))
+
+(def string-join (ch a)
+  (str (aloop (x . rest) a
+         (if (is x "")
+             (cons #\newline (self rest))
+             (if (is (last x) #\\)
+                   (list* (cut x 0 -1) (and rest #\newline) (self rest))
+                 rest
+                   (if (is (car rest) "")
+                       (list* x #\newline (self rest))
+                       (list* x ch (self rest)))
+                 (cons x (self rest)))))))
+
+(def make-string-parser (self x name ch f)
+  (fn (_ s s2)
+    (let i (+ (x "indent") 2)
+      (if (and (is s "")
+               (isnt s2 ""))
+          (f-err (str "expected space or newline but got " (s2 0)) x i)
+          (let a (map x (get-indented >= i)
+                   (if (empty x)
+                       (x "text")
+                       (str (n-of (- (x "indent") i) #\space)
+                            (f (+ (x "indent") 1) x (x "text")))))
+            (cons (if (is s2 "")
+                      (string-join ch a)
+                      (string-join ch (cons (f (+ i 1) x s2) a)))
+                  (self)))))))
+
+(def readable (x)
+  (if (or (is x #\space)
+          (is x " "))
+        "space"
+      (or (not x)
+          (eof? x)
+          (is x #\newline)
+          (is x "\n"))
+        "newline"
+      x))
+
+(def hex->char (x e col)
+  (let x ((% string->number) x 16)
+    (if (<= 55296 x 57343)
+        (f-err "D800 - DFFF are invalid" e col)
+        ((% integer->char) x))))
+
+(def string-escape (col e s)
+  (with (s  (->input s)
+         r  nil)
+    (while (not (eof? (peek s)))
+      (awhen (re1 "^[^\\\\]*" s)
+        (= col (+ col (len it)))
+        (push it r))
+      (awhen (re1 "^\\\\" s)
+        (= col (+ col 1))
+         ; TODO use if instead
+        (when (eof? (peek s))
+          (push it r))
+        (awhen (re1 "^." s)
+          (case it
+            "\\" (push #\\ r)
+            "s"  (push #\space r)
+            "n"  (push #\newline r)
+            "u"  (do (let x (re1 "^." s)
+                       (= col (+ col 1))
+                       (when (isnt x "(") ;)
+                         (f-err (str "expected ( but got " (readable x)) e col))) ;)
+                     (awith ()
+                       (iflet x (re1 "^[0-9a-fA-F]+" s)
+                         (do (= col (+ col (len x)))
+                             ; TODO
+                             (push (hex->char x e col) r)
+                             (= col (+ col 1))
+                             (let x (read s) ;(
+                               (if (is x #\))
+                                     nil
+                                   (is x #\space)
+                                     (self) ;(
+                                   (f-err (str "expected space or ) but got " (readable x))
+                                          e col))))
+                         (f-err (str "expected any of [0123456789abcdefABCDEF] but got "
+                                     (readable (peek s)))
+                                e (+ col 1)))))
+                 (f-err (str "expected any of [newline \\ s n u] but got " it)
+                        e col))
+          (= col (+ col 1)))))
+    (str (rev r))))
+
+(def parse1 (self)
+  (let x (car iter)
+    (= iter (cdr iter))
+    (re-multi (x "text")
+      "^@([^ ]*)( *)(.*)$"
+        (fn (_ s s2 s3)
+          (withs (after  (when (isnt s3 "")
+                           (push (dict "indent" (+ (x "indent") 1 (len s) (len s2))
+                                       "text"   s3
+                                       "line"   (x "line"))
+                                 iter)
+                           (car (parse1 (fn () nil))))
+                  rest   (let i (first-indent)
+                           (when (and i (> i (x "indent")))
+                             (awith ()
+                               (when (cons? iter)
+                                 (let x (car iter)
+                                   (when (or (empty x)
+                                             (is (x "indent") i))
+                                     (parse1 self))))))))
+            (cons (if (isnt s "")
+                      (if after
+                          (list* s after rest)
+                          (cons s rest))
+                      (if after
+                          (cons after rest)
+                          rest))
+                  (self))))
+      "^#"
+        (fn (_)
+          (get-indented >= (+ (x "indent") 1))
+          (self))
+      "^>( ?)(.*)$"
+        (make-string-parser self x ">" #\newline (fn (col e x) x))
+      "^\"( ?)(.*)$"
+        (make-string-parser self x "\"" #\space string-escape)
+      "^$"
+        (fn (_) (self))
+      "^.*$"
+        (fn (s)
+          (cons s (self))))))
+
+(def parse (s)
+  (let x (normalize (->input s))
+    (w/ iter x
+      (let i (first-indent)
+        (awith ()
+          (when (cons? iter)
+            (if (empty (car iter))
+                (do (= iter (cdr iter))
+                    (self))
+                (let i2 ((car iter) "indent")
+                  (if (isnt i i2)
+                      (f-err (str "expected an indent of " i " but got " i2) (car iter) i2)
+                      (parse1 self))))))))))

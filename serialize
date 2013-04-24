@@ -1,5 +1,3 @@
-(import re)
-
 (var nuit-complex "(?:^[@>\"#])|\n|^$")
 
 ; TODO fix this name
