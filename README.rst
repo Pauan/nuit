@@ -83,7 +83,7 @@ The ``@`` sigil creates a list:
 
 ----
 
-The ``#`` sigil completely ignores the rest of the line\ [#newline]_ and everything that is indented further than the sigil::
+The ``#`` sigil completely ignores the rest of the line\ [#eol]_ and everything that is indented further than the sigil::
 
   Nuit  #foo bar
           qux corge
@@ -100,7 +100,7 @@ The ``>`` and ``"`` sigils use the following indent rules:
 
 2. The "index" is the indentation + the sigil + 1 (one).
 
-3. Everything between "index" and the end of the line\ [#newline]_ is included in the sigil::
+3. Everything between "index" and the end of the line\ [#eol]_ is included in the sigil::
 
      Nuit  > foobar
      JSON  "foobar"
@@ -176,7 +176,7 @@ The ``>`` and ``"`` sigils use the following indent rules:
 
 * Within the string, ``\`` has the following meaning:
 
-  * ``\`` at the end of the line\ [#newline]_ inserts a literal newline (``U+000A``), except at the end of the string, in which case it does nothing::
+  * ``\`` at the end of the line\ [#eol]_ inserts a literal newline\ [#newline]_, except at the end of the string, in which case it does nothing::
 
       Nuit  " foobar\
               quxcorge\
@@ -193,7 +193,7 @@ The ``>`` and ``"`` sigils use the following indent rules:
       Nuit  " foobar\s
       JSON  "foobar "
 
-  * ``\n`` inserts a literal newline (``U+000A``)::
+  * ``\n`` inserts a literal newline\ [#newline]_::
 
       Nuit  " foobar\n
       JSON  "foobar\n"
@@ -213,11 +213,11 @@ The ``>`` and ``"`` sigils use the following indent rules:
 
 ----
 
-If a line does not start with any of the above sigils it is treated as a string that continues until the end of the line\ [#newline]_.
+If a line does not start with any of the above sigils it is treated as a string that continues until the end of the line\ [#eol]_.
 
 ----
 
-Whitespace\ [#whitespace]_ is *completely* ignored at the end of the line\ [#newline]_, even within strings.
+Whitespace\ [#whitespace]_ is *completely* ignored at the end of the line\ [#eol]_, even within strings.
 
 Except within strings, empty lines are *completely* ignored. They don't even count for indentation.
 
@@ -330,7 +330,17 @@ All other Unicode characters may be used freely.
 
 
 .. [#newline]
-   End of line is defined as either ``EOF``, ``U+000A`` (newline), ``U+000D`` (carriage return), or ``U+000D`` followed by ``U+000A``. Parsers must convert all end of lines (excluding ``EOF``) within strings to ``U+000A``
+   Newline is defined as either ``U+000A`` (newline), ``U+000D`` (carriage return), or ``U+000D`` followed by ``U+000A``.
+
+   Newlines (including those created by the ``\n`` and Unicode code point\ [#unicode]_ escapes) may be replaced with a different newline. e.g. a parser on a Unix system may convert all newlines to ``U+000A``.
+
+   When serializing strings, all newlines must be converted as appropriate. e.g. when transmitting over HTTP, all newlines must be converted to ``U+000D U+000A``, when saving to a file on a Unix system, all newlines must be converted to ``U+000A``, etc.
+
+   To accommodate this, the serializer must either be smart enough to know what newline is appropriate, or it must provide some way for the user to specify the appropriate newline.
+
+
+.. [#eol]
+   End of line is defined as either ``EOF`` or newline\ [#newline]_.
 
 
 .. [#unicode]
