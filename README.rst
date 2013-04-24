@@ -90,7 +90,7 @@ The ``#`` sigil completely ignores the rest of the line\ [#newline]_ and everyth
          @nou yes
             maybe someday
         @not included
-  JSON  ["not", included"]
+  JSON  ["not", "included"]
 
 ----
 
