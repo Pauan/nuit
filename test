@@ -18,6 +18,114 @@
            (prn))))))
 
 
+(assert '(("foo"))
+  (parse "@foo"))
+
+(assert '(("foo" "bar"))
+  (parse "@foo bar"))
+
+(assert '(("foo bar"))
+  (parse "@ foo bar"))
+
+(assert '(("foo" ("bar" "qux")))
+  (parse "@foo @bar qux"))
+
+(assert '(("foo" "bar qux" "corge"))
+  (parse "@foo bar qux\n  corge"))
+
+(assert '(("foo" "bar qux") "corge")
+  (parse "@foo bar qux\ncorge"))
+
+(assert (err "expected an indent of 0 but got 4
+      not included  (line 5, column 4)
+     ^")
+  (parse "@foo bar qux\n  corge\n  maybe\n  someday\n    not included"))
+
+(assert '(("foo" "bar qux" "corge" "maybe" "someday"))
+  (parse "@foo bar qux\n  corge\n  maybe\n  someday"))
+
+(assert '(("foo" ("bar" "qux" "yes nou") "corge" ("maybe" () "someday")))
+  (parse "@foo @bar qux\n       yes nou\n  corge\n  @maybe\n    @\n    someday"))
+
+(assert '(("not" "included"))
+  (parse "#foo bar\n  qux corge\n @nou yes\n    maybe someday\n@not included"))
+
+(assert '("foobar")
+  (parse "> foobar"))
+
+(assert '(" foobar")
+  (parse ">  foobar"))
+
+(assert '("")
+  (parse ">"))
+
+(assert '("foobar")
+  (parse ">\n  foobar"))
+
+(assert '("foobar\nquxcorge\nnou yes")
+  (parse "> foobar\n  quxcorge\n  nou yes"))
+
+(assert '("   foobar\n    quxcorge\n   nou\n yes")
+  (parse ">    foobar\n      quxcorge\n     nou\n   yes"))
+
+(assert '("  foobar\nquxcorge\nnou yes")
+  (parse ">\n    foobar\n  quxcorge\n  nou yes"))
+
+(assert '("foobar\nquxcorge\n\nnou\n\nyes")
+  (parse "> foobar\n  quxcorge\n\n  nou\n\n  yes"))
+
+(assert '("foobar quxcorge nou")
+  (parse "\" foobar\n  quxcorge\n  nou"))
+
+(assert '("foobar\n\nquxcorge\n\nnou")
+  (parse "\" foobar\n\n  quxcorge\n\n  nou"))
+
+(assert '("foobar\nquxcorge\nnou")
+  (parse "\" foobar\\\n  quxcorge\\\n  nou\\"))
+
+(assert '("foo\\bar")
+  (parse "\" foo\\\\bar"))
+
+(assert '("foobar ")
+  (parse "\" foobar\\s"))
+
+(assert '("foobar\n")
+  (parse "\" foobar\\n"))
+
+(assert '("foobar\n quxcorge")
+  (parse "\" foobar\\n\n  quxcorge"))
+
+(assert '("foo\u0020\u20ACbar")
+  (parse "\" foo\\u(20 20AC)bar"))
+
+(assert '(("playlist" "5 Stars"
+            "05 - Memories of Green"
+            "51 - Time Circuits"
+            "55 - Undersea Palace")
+          ("playlist" "4 Stars"
+            "47 - Battle with Magus"
+            "53 - Sara's (Schala's) Theme"
+            "64 - To Far Away Times")
+          ("playlist" "3 Stars"
+            "11 - Secret of the Forest"
+            "36 - The Brink of Time"))
+  (parse "@playlist 5 Stars
+  05 - Memories of Green
+  51 - Time Circuits
+  55 - Undersea Palace
+
+@playlist 4 Stars
+  47 - Battle with Magus
+  53 - Sara's (Schala's) Theme
+  64 - To Far Away Times
+
+@playlist 3 Stars
+  11 - Secret of the Forest
+  36 - The Brink of Time"))
+
+
+
+
 (assert (err "invalid character \t
   \tfoobar  (line 1, column 1)
   ^")
