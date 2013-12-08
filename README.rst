@@ -49,8 +49,21 @@ The ``@`` sigil creates a list:
 
      Nuit  @foo @bar qux
      JSON  ["foo", ["bar", "qux"]]
+   
+   ::
 
-3. If the next non-empty line has a greater indent than the first line, then the second line is added to the list, otherwise it isn't::
+     Nuit  @foo @bar qux
+                  corge
+     JSON  ["foo", ["bar", "qux", "corge"]]
+
+3. It is valid to have a list without anything on the first line, in which case the first line is ignored::
+
+     Nuit  @
+             foo bar qux
+             corge maybe
+     JSON  ["foo bar qux", "corge maybe"]
+
+4. If the next non-empty line has a greater indent than the first line, then the second line is added to the list, otherwise it isn't::
 
      Nuit  @foo bar qux
              corge
@@ -62,7 +75,7 @@ The ``@`` sigil creates a list:
            corge
      JSON  ["foo", "bar qux"]
 
-4. Every line after the second line that has the **same indent** as the second line is added to the list::
+5. Every line after the second line that has the **same indent** as the second line is added to the list::
 
      Nuit  @foo bar qux
              corge
@@ -71,7 +84,13 @@ The ``@`` sigil creates a list:
                not included
      JSON  ["foo", "bar qux", "corge", "maybe", "someday"]
 
-5. The above rules are recursive, which allows lists to nest within lists::
+6. It is **NOT** valid to have a list where sub-elements are not the same indent::
+
+     Nuit  @foo
+              bar
+             qux
+
+7. The above rules are recursive, which allows lists to nest within lists::
 
      Nuit  @foo @bar qux
                   yes nou
@@ -80,13 +99,6 @@ The ``@`` sigil creates a list:
                @
                someday
      JSON  ["foo", ["bar", "qux", "yes nou"], "corge", ["maybe", [], "someday"]]
-
-6. It is valid to have a list without anything on the first line, in which case the first line is ignored::
-
-     Nuit  @
-             foo bar qux
-             corge maybe
-     JSON  ["foo bar qux", "corge maybe"]
 
 ----
 
@@ -324,7 +336,9 @@ To represent them, you must use a Unicode code point escape\ [#unicode]_.
 
 ----
 
-The Unicode byte order mark ``U+FEFF`` is invalid everywhere except as the first character in the stream. It is used for encoding and is an implementation detail. Thus, it has no effect on indentation, is not included in strings, etc. In other words, aside from using it to decode the stream of bytes, it should be completely ignored by the parser.
+The Unicode byte order mark ``U+FEFF`` is invalid everywhere except as the first character in the stream. It is used for encoding and is an implementation detail. Thus, it has no effect on indentation, is not included in strings, etc.
+
+In other words, aside from using it to decode the stream of bytes, it should be completely ignored by the parser.
 
 ----
 
