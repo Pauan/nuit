@@ -379,7 +379,7 @@ All other Unicode characters may be used freely.
 
    Unicode code point escapes are necessary to include invalid characters (listed above). They are also useful in the situation where you don't have an easy way to insert a Unicode character directly, but you do know its code point, e.g. you can represent the string ``foo€bar`` as ``" foo\u(20AC)bar``
    
-   You can also use Unicode code point escapes to include newline\ [#newline]_ characters directly, so they won't be converted by the parser/serializer.
+   You can also use Unicode code point escapes to include newline\ [#newline]_ characters so they won't be converted by the parser/serializer.
 
 
 Comparison
