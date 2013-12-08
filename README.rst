@@ -154,7 +154,7 @@ The ``>`` and ``"`` sigils use the following indent rules:
              yes
      JSON  "foobar\nquxcorge\n\nnou\n\nyes"
 
-6. Empty lines at the end of the string are ignored::
+7. Empty lines at the end of the string are ignored::
 
      Nuit  > foobar
              quxcorge
