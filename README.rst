@@ -50,7 +50,7 @@ The ``@`` sigil creates a list:
      Nuit  @foo @bar qux
      JSON  ["foo", ["bar", "qux"]]
 
-3. If the second line has a greater indent than the first line, then the second line is added to the list, otherwise it isn't::
+3. If the next non-empty line has a greater indent than the first line, then the second line is added to the list, otherwise it isn't::
 
      Nuit  @foo bar qux
              corge
@@ -153,6 +153,14 @@ The ``>`` and ``"`` sigils use the following indent rules:
 
              yes
      JSON  "foobar\nquxcorge\n\nnou\n\nyes"
+
+6. Empty lines at the end of the string are ignored::
+
+     Nuit  > foobar
+             quxcorge
+
+           nou
+     JSON  ["foobar\nquxcorge", "nou"]
 
 ``>`` creates a string that contains everything that is included by the above indent rules.
 
@@ -332,9 +340,9 @@ All other Unicode characters may be used freely.
 .. [#newline]
    Newline is defined as either ``U+000A`` (newline), ``U+000D`` (carriage return), or ``U+000D`` followed by ``U+000A``.
 
-   Newlines (including those created by the ``\n`` and Unicode code point\ [#unicode]_ escapes) may be replaced with a different newline. e.g. a parser on a Unix system may convert all newlines to ``U+000A``.
+   Newlines included in the character stream, and newlines inserted using the ``\`` and ``\n`` string escapes (but **NOT** newlines created with Unicode code point\ [#unicode]_ escapes) may be replaced with a different newline. e.g. a parser on a Unix system may convert the newlines to ``U+000A``.
 
-   When serializing strings, all newlines must be converted as appropriate. e.g. when transmitting over HTTP, all newlines must be converted to ``U+000D U+000A``, when saving to a file on a Unix system, all newlines must be converted to ``U+000A``, etc.
+   When serializing strings, all newlines must be converted as appropriate. e.g. when transmitting over HTTP, all newlines (excluding those written using Unicode code point\ [#unicode]_ escapes) must be converted to ``U+000D U+000A``, when saving to a file on a Unix system, all newlines must be converted to ``U+000A``, etc.
 
    To accommodate this, the serializer must either be smart enough to know what newline is appropriate, or it must provide some way for the user to specify the appropriate newline.
 
@@ -349,6 +357,8 @@ All other Unicode characters may be used freely.
    Each sequence of characters is the hexadecimal value of a Unicode code point. As an example, the string ``" fob`` is the same as ``" \u(66)\u(6F)\u(62)`` which is the same as ``" \u(66 6F 62)``. Because they are *code points* and not bytes, ``\u(1D11E)`` represents the Unicode character ``𝄞``
 
    Unicode code point escapes are necessary to include invalid characters (listed above). They are also useful in the situation where you don't have an easy way to insert a Unicode character directly, but you do know its code point, e.g. you can represent the string ``foo€bar`` as ``" foo\u(20AC)bar``
+   
+   You can also use Unicode code point escapes to include newline\ [#newline]_ characters directly, so they won't be converted by the parser/serializer.
 
 
 Comparison
