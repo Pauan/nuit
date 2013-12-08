@@ -81,6 +81,13 @@ The ``@`` sigil creates a list:
                someday
      JSON  ["foo", ["bar", "qux", "yes nou"], "corge", ["maybe", [], "someday"]]
 
+6. It is valid to have a list without anything on the first line, in which case the first line is ignored::
+
+     Nuit  @
+             foo bar qux
+             corge maybe
+     JSON  ["foo bar qux", "corge maybe"]
+
 ----
 
 The ``#`` sigil completely ignores the rest of the line\ [#eol]_ and everything that is indented further than the sigil::
@@ -317,7 +324,7 @@ To represent them, you must use a Unicode code point escape\ [#unicode]_.
 
 ----
 
-The Unicode byte order mark ``U+FEFF`` is invalid everywhere except as the first character in the stream. It is used for encoding and is an implementation detail. Thus, it has no effect on indentation, is not included in strings, etc.
+The Unicode byte order mark ``U+FEFF`` is invalid everywhere except as the first character in the stream. It is used for encoding and is an implementation detail. Thus, it has no effect on indentation, is not included in strings, etc. In other words, aside from using it to decode the stream of bytes, it should be completely ignored by the parser.
 
 ----
 
