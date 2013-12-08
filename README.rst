@@ -344,9 +344,9 @@ All other Unicode characters may be used freely.
 
 
 .. [#unicode]
-   A Unicode code point escape starts with ``\u(``, contains one or more strings (which must contain only the hexadecimal characters ``0123456789abcdefABCDEF``) separated by a single space\ [#whitespace]_, and ends with ``)``
+   A Unicode code point escape starts with ``\u(``, contains one or more hexadecimal characters (``0123456789abcdefABCDEF``) separated by a single space\ [#whitespace]_, and ends with ``)``
 
-   Each string is the hexadecimal value of a Unicode code point. As an example, the string ``" fob`` is the same as ``" \u(66)\u(6F)\u(62)`` which is the same as ``" \u(66 6F 62)``. Because they are *code points* and not bytes, ``\u(1D11E)`` represents the Unicode character ``𝄞``
+   Each sequence of characters is the hexadecimal value of a Unicode code point. As an example, the string ``" fob`` is the same as ``" \u(66)\u(6F)\u(62)`` which is the same as ``" \u(66 6F 62)``. Because they are *code points* and not bytes, ``\u(1D11E)`` represents the Unicode character ``𝄞``
 
    Unicode code point escapes are necessary to include invalid characters (listed above). They are also useful in the situation where you don't have an easy way to insert a Unicode character directly, but you do know its code point, e.g. you can represent the string ``foo€bar`` as ``" foo\u(20AC)bar``
 
