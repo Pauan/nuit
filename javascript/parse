@@ -12,7 +12,8 @@ requirejs.config({
 })
 
 requirejs(["./branch/parse", "fs"], function (parse, fs) {
-  fs.readFile("../test.json", { encoding: "UTF-8" }, function (err, data) {
+  // TODO what the...? why is this "parse.json" and not "../parse.json"?
+  fs.readFile("parse.json", { encoding: "UTF-8" }, function (err, data) {
     if (err) {
       throw err
     }
@@ -38,15 +39,30 @@ requirejs(["./branch/parse", "fs"], function (parse, fs) {
       }
     }
     
+    function print(x) {
+      if (Array.isArray(x)) {
+        return "(" + x.map(print).join(" ") + ")"
+      } else {
+        if (x === "") {
+          return "\"\""
+        } else {
+          return "" + x
+        }
+      }
+    }
+    
     data.forEach(function (x) {
       try {
         var val = parse(x.text)
         if (x.value != null) {
           if (!iso(val, x.value)) {
-            console.error("did not match: " + val + " " + x.value)
+            console.log("did not match: " + print(val) + "\n               " + print(x.value))
           } else {
-            console.log(val, "===", x.value)
+            //console.log("matched: " + print(val) + "\n         " + print(x.value))
           }
+        }
+        if (x.error) {
+          console.log("expected error but got: " + print(val))
         }
       } catch (e) {
         if (x.error) {

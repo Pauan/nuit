@@ -1,0 +1,373 @@
+[
+  {
+    "text" : "@foo",
+    "value": [["foo"]]
+  }, {
+    "text" : "@foo bar",
+    "value": [["foo", "bar"]]
+  }, {
+    "text" : "@ foo bar",
+    "value": [["foo bar"]]
+  }, {
+    "text" : "@foo @bar qux",
+    "value": [["foo", ["bar", "qux"]]]
+  }, {
+    "text" : "@foo @bar qux\n       corge",
+    "value": [["foo", ["bar", "qux", "corge"]]]
+  }, {
+    "text" : "@\n  foo bar qux\n  corge maybe",
+    "value": [["foo bar qux", "corge maybe"]]
+  }, {
+    "text" : "@foo bar qux\n  corge",
+    "value": [["foo", "bar qux", "corge"]]
+  }, {
+    "text" : "@foo bar qux\ncorge",
+    "value": [["foo", "bar qux"], "corge"]
+  }, {
+    "text" : "@foo bar qux\n  corge\n  maybe\n  someday",
+    "value": [["foo", "bar qux", "corge", "maybe", "someday"]]
+  }, {
+    "text" : "@foo\n   bar\n  qux",
+    "error": true
+  }, {
+    "text" : "@foo @bar qux\n       yes nou\n  corge\n  @maybe\n    @\n    someday",
+    "value": [["foo", ["bar", "qux", "yes nou"], "corge", ["maybe", [], "someday"]]]
+  }, {
+    "text" : "#foo bar\n  qux corge\n @nou yes\n    maybe someday\n@not included",
+    "value": [["not", "included"]]
+  }, {
+    "text" : "> foobar",
+    "value": ["foobar"]
+  }, {
+    "text" : ">  foobar",
+    "value": [" foobar"]
+  }, {
+    "text" : ">",
+    "value": [""]
+  }, {
+    "text" : ">\n  foobar",
+    "value": ["foobar"]
+  }, {
+    "text" : "> foobar\n  quxcorge\n  nou yes",
+    "value": ["foobar\nquxcorge\nnou yes"]
+  }, {
+    "text" : ">    foobar\n      quxcorge\n     nou\n   yes",
+    "value": ["   foobar\n    quxcorge\n   nou\n yes"]
+  }, {
+    "text" : ">\n    foobar\n  quxcorge\n  nou yes",
+    "value": ["  foobar\nquxcorge\nnou yes"]
+  }, {
+    "text" : "> foobar\n  quxcorge\n\n  nou\n\n  yes",
+    "value": ["foobar\nquxcorge\n\nnou\n\nyes"]
+  }, {
+    "text" : "> foobar\n  quxcorge\n\nnou",
+    "value": ["foobar\nquxcorge", "nou"]
+  }, {
+    "text" : "\" foobar\n  quxcorge\n  nou",
+    "value": ["foobar quxcorge nou"]
+  }, {
+    "text" : "\" foobar\n\n  quxcorge\n\n  nou",
+    "value": ["foobar\n\nquxcorge\n\nnou"]
+  }, {
+    "text" : "\" foobar\\\n  quxcorge\\\n  nou\\",
+    "value": ["foobar\nquxcorge\nnou"]
+  }, {
+    "text" : "\" foo\\\\bar",
+    "value": ["foo\\bar"]
+  }, {
+    "text" : "\" foobar\\s",
+    "value": ["foobar "]
+  }, {
+    "text" : "\" foobar\\n",
+    "value": ["foobar\n"]
+  }, {
+    "text" : "\" foobar\\n\n  quxcorge",
+    "value": ["foobar\n quxcorge"]
+  }, {
+    "text" : "\" foo\\u(20 20AC)bar",
+    "value": ["foo\u0020\u20ACbar"]
+  }, {
+    "text" : "@playlist 5 Stars\n  05 - Memories of Green\n  51 - Time Circuits\n  55 - Undersea Palace\n\n@playlist 4 Stars\n  47 - Battle with Magus\n  53 - Sara's (Schala's) Theme\n  64 - To Far Away Times\n\n@playlist 3 Stars\n  11 - Secret of the Forest\n  36 - The Brink of Time",
+    "value": [["playlist", "5 Stars",
+                "05 - Memories of Green",
+                "51 - Time Circuits",
+                "55 - Undersea Palace"],
+              ["playlist", "4 Stars",
+                "47 - Battle with Magus",
+                "53 - Sara's (Schala's) Theme",
+                "64 - To Far Away Times"],
+              ["playlist", "3 Stars",
+                "11 - Secret of the Forest",
+                "36 - The Brink of Time"]]
+  }, {
+    "text" : "\" fob",
+    "value": ["fob"]
+  }, {
+    "text" : "\" \\u(66)\\u(6F)\\u(62)",
+    "value": ["fob"]
+  }, {
+    "text" : "\" \\u(66 6F 62)",
+    "value": ["fob"]
+  }, {
+    "text" : "\" \\u(1D11E)",
+    "value": ["턞"]
+  }, {
+    "text" : "\" foo\\u(20AC)bar",
+    "value": ["foo€bar"]
+  },
+  
+  
+  {
+    "text" : "@foo bar qux\n\n\n  corge",
+    "value": [["foo", "bar qux", "corge"]]
+  }, {
+    "text" : ">foo",
+    "error": true
+  }, {
+    "text" : "\"foo",
+    "error": true
+  }, {
+    "text" : "\" foobar\\\n  quxcorge\\\n  nou\\\n\n\nqux",
+    "value": ["foobar\nquxcorge\nnou", "qux"]
+  }, {
+    "text" : "\" foo\\bar",
+    "error": true
+  }, {
+    "text" : "> foo bar  \n  test uh huh    ",
+    "value": ["foo bar\ntest uh huh"]
+  }, {
+    "text" : "@foo\n\n  bar\n\n  qux",
+    "value": [["foo", "bar", "qux"]],
+    "error": true
+  }, {
+    "text" : "foo\n\nbar\n\nqux",
+    "value": ["foo", "bar", "qux"]
+  }, {
+    "text" : " foo\nbar",
+    "error": true
+  }, {
+    "text" : "\u0009",
+    "error": true
+  }, {
+    "text" : "\u000B",
+    "error": true
+  }, {
+    "text" : "\u000C",
+    "error": true
+  }, {
+    "text" : "\u0085",
+    "error": true
+  }, {
+    "text" : "\u00A0",
+    "error": true
+  }, {
+    "text" : "\u1680",
+    "error": true
+  }, {
+    "text" : "\u180E",
+    "error": true
+  }, {
+    "text" : "\u1FFF",
+    "value": ["\u1FFF"]
+  }, {
+    "text" : "\u2000",
+    "error": true
+  }, {
+    "text" : "\u2002",
+    "error": true
+  }, {
+    "text" : "\u200A",
+    "error": true
+  }, {
+    "text" : "\u200B",
+    "value": ["\u200B"]
+  }, {
+    "text" : "\u2028",
+    "error": true
+  }, {
+    "text" : "\u2029",
+    "error": true
+  }, {
+    "text" : "\u202F",
+    "error": true
+  }, {
+    "text" : "\u205F",
+    "error": true
+  }, {
+    "text" : "\u3000",
+    "error": true
+  }, {
+    "text" : "\u0000",
+    "error": true
+  }, {
+    "text" : "\u0005",
+    "error": true
+  }, {
+    "text" : "\u0008",
+    "error": true
+  }, {
+    "text" : "\u000D",
+    "value": ["\u000D"]
+  }, {
+    "text" : "\u000E",
+    "error": true
+  }, {
+    "text" : "\u001B",
+    "error": true
+  }, {
+    "text" : "\u001F",
+    "error": true
+  }, {
+    "text" : "\u0020",
+    "value": ["\u0020"]
+  }, {
+    "text" : "\u007E",
+    "value": ["\u007E"]
+  }, {
+    "text" : "\u007F",
+    "error": true
+  }, {
+    "text" : "\u0082",
+    "error": true
+  }, {
+    "text" : "\u0084",
+    "error": true
+  }, {
+    "text" : "\u0086",
+    "error": true
+  }, {
+    "text" : "\u0092",
+    "error": true
+  }, {
+    "text" : "\u009F",
+    "error": true
+  }, {
+    "text" : "\uFDCF",
+    "value": ["\uFDCF"]
+  }, {
+    "text" : "\uFDD0",
+    "error": true
+  }, {
+    "text" : "\uFDD5",
+    "error": true
+  }, {
+    "text" : "\uFDEF",
+    "error": true
+  }, {
+    "text" : "\uFDF0",
+    "value": ["\uFDF0"]
+  }, {
+    "text" : "\uFFFE",
+    "error": true
+  }, {
+    "text" : "\uFFFF",
+    "error": true
+  }, {
+    "text" : "\u1FFFE",
+    "error": true
+  }, {
+    "text" : "\u1FFFF",
+    "error": true
+  }, {
+    "text" : "\u10FFFE",
+    "error": true
+  }, {
+    "text" : "\u10FFFF",
+    "error": true
+  }, {
+    "text" : "\uFEFF",
+    "value": []
+  }, {
+    "text" : "a\uFEFF",
+    "error": true
+  }, {
+    "text" : "\uD7FF",
+    "value": ["\uD7FF"]
+  }, {
+    "text" : "\uD800",
+    "error": true
+  }, {
+    "text" : "\uDA00",
+    "error": true
+  }, {
+    "text" : "\uDFFF",
+    "error": true
+  }, {
+    "text" : "\uE000",
+    "value": ["\uE000"]
+  }, {
+    "text" : "\" \\u(D7FF)",
+    "value": ["\uD7FF"]
+  }, {
+    "text" : "\" \\u(D800)",
+    "error": true
+  }, {
+    "text" : "\" \\u(DA00)",
+    "error": true
+  }, {
+    "text" : "\" \\u(DFFF)",
+    "error": true
+  }, {
+    "text" : "\" \\u(E000)",
+    "value": ["\uE000"]
+  }, {
+    "text" : "@foo\n  bar",
+    "value": [["foo", "bar"]]
+  }, {
+    "text" : "@foo\r  bar",
+    "value": [["foo", "bar"]]
+  }, {
+    "text" : "@foo\r\n  bar",
+    "value": [["foo", "bar"]]
+  }, {
+    "text" : "> foo\r\n  bar",
+    "value": ["foo\nbar"]
+  }, {
+    "text" : "\" foo\\\r\n  bar",
+    "value": ["foo\nbar"]
+  }, {
+    "text" : "\" foo\\nbar",
+    "value": ["foo\nbar"]
+  }, {
+    "text" : "\" foo\\u(D A)bar",
+    "value": ["foo\r\nbar"]
+  }, {
+    "text" : "\" \\u (",
+    "error": true
+  }, {
+    "text" : "\" \\u(",
+    "error": true
+  }, {
+    "text" : "\" \\u(a",
+    "error": true
+  }, {
+    "text" : "\" \\u(z",
+    "error": true
+  }, {
+    "text" : "\" \\u(a)",
+    "value": ["\u000A"]
+  }, {
+    "text" : "\" \\u(a b)",
+    "value": ["\u000A\u000B"]
+  }, {
+    "text" : "\" \\u(a  b)",
+    "error": true
+  }, {
+    "text" : "\" \\u( a)",
+    "error": true
+  }, {
+    "text" : "\" \\u(a )",
+    "error": true
+  },
+
+  {
+    "text" : "",
+    "value": []
+  }, {
+    "text" : "@foo @bar\n      qux\n corge\n  test",
+    "error": true
+  }, {
+    "text" : "@foo\n corge\n  test",
+    "error": true
+  }
+]
