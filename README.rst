@@ -4,6 +4,8 @@ Nuit attempts to combine the ease-of-use and conciseness of YAML with the simpli
 
 This branch only contains general information about the Nuit text format. For specific implementations, please see the other branches.
 
+You can also see the "test" branch, which contains unit tests to verify the correctness of the implementations.
+
 Goals
 =====
 
