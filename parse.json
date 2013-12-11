@@ -356,5 +356,8 @@
   }, {
     "text" : "@foo\n corge\n  test",
     "error": true
+  }, {
+    "text" : "\n\n@foo @bar qux\n       # yes nou\n\n  > corge\n    testing\n\n  @maybe\n    @\n\n    \" someday\n\n",
+    "value": [["foo", ["bar", "qux"], "corge\ntesting", ["maybe", [], "someday"]]]
   }
 ]
