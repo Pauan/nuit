@@ -83,7 +83,6 @@ The ``@`` sigil creates a list:
              corge
              maybe
              someday
-               not included
      JSON  ["foo", "bar qux", "corge", "maybe", "someday"]
 
 6. It is **NOT** valid to have a list where sub-elements are not the same indent::
@@ -108,6 +107,7 @@ The ``#`` sigil completely ignores the rest of the line\ [#eol]_ and everything 
 
   Nuit  #foo bar
           qux corge
+
          @nou yes
             maybe someday
         @not included
