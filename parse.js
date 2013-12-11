@@ -199,7 +199,6 @@ define([], function () {
     case "@":
       var a = /^@([^ ]*)( *)(.*)$/.exec(x.text)
       var r = []
-      console.log(a)
       if (a[1] !== "") {
         r.push(a[1])
       }
