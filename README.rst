@@ -95,11 +95,12 @@ The ``@`` sigil creates a list:
 
      Nuit  @foo @bar qux
                   yes nou
-             corge
+             > corge
+               testing
              @maybe
                @
-               someday
-     JSON  ["foo", ["bar", "qux", "yes nou"], "corge", ["maybe", [], "someday"]]
+               " someday
+     JSON  ["foo", ["bar", "qux", "yes nou"], "corge\ntesting", ["maybe", [], "someday"]]
 
 ----
 
