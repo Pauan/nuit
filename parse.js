@@ -236,7 +236,9 @@ define([], function () {
     var indent = o.peek().indent
     while (o.has()) {
       var x = o.peek()
-      if (x.indent === indent) {
+      if (x.text === "") {
+        o.read()
+      } else if (x.indent === indent) {
         var y = parse(o, o.read())
         if (y !== null) {
           r.push(y)
