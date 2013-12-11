@@ -1,0 +1,60 @@
+#! /usr/bin/env node
+
+// Relies upon Node.js because the browser can't load local files with XHR
+
+var requirejs = require("./r.js")
+
+requirejs.config({
+  //Pass the top-level main.js/index.js require
+  //function to requirejs so that node modules
+  //are loaded relative to the top-level JS file.
+  nodeRequire: require
+})
+
+requirejs(["./branch/parse", "fs"], function (parse, fs) {
+  fs.readFile("../test.json", { encoding: "UTF-8" }, function (err, data) {
+    if (err) {
+      throw err
+    }
+    data = JSON.parse(data)
+    
+    // TODO simple, but only works for arrays
+    function iso(x, y) {
+      if (Array.isArray(x)) {
+        if (Array.isArray(y) && x.length === y.length) {
+          for (var i = 0, iLen = x.length; i < iLen; ++i) {
+            if (!iso(x[i], y[i])) {
+              return false
+            }
+          }
+          return true
+        } else {
+          return false
+        }
+      } else if (Array.isArray(y)) {
+        return false
+      } else {
+        return x === y
+      }
+    }
+    
+    data.forEach(function (x) {
+      try {
+        var val = parse(x.text)
+        if (x.value != null) {
+          if (!iso(val, x.value)) {
+            console.error("did not match: " + val + " " + x.value)
+          } else {
+            console.log(val, "===", x.value)
+          }
+        }
+      } catch (e) {
+        if (x.error) {
+          console.log(e)
+        } else {
+          throw e
+        }
+      }
+    })
+  })
+})
