@@ -51,26 +51,35 @@ requirejs(["./branch/parse", "fs"], function (parse, fs) {
       }
     }
     
+    var passed = 0
+      , failed = 0
+    
     data.forEach(function (x) {
       try {
         var val = parse(x.text)
         if (x.value != null) {
-          if (!iso(val, x.value)) {
-            console.log("did not match: " + print(val) + "\n               " + print(x.value))
-          } else {
+          if (iso(val, x.value)) {
+            ++passed
             //console.log("matched: " + print(val) + "\n         " + print(x.value))
+          } else {
+            ++failed
+            console.log("did not match: " + print(val) + "\n               " + print(x.value))
           }
         }
         if (x.error) {
+          ++failed
           console.log("expected error but got: " + print(val))
         }
       } catch (e) {
         if (x.error) {
-          console.log(e)
+          ++passed
+          //console.log(e)
         } else {
           throw e
         }
       }
     })
+    
+    console.log(data.length + " tests: " + passed + " passed / " + failed + " failed")
   })
 })

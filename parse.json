@@ -33,7 +33,7 @@
     "text" : "@foo @bar qux\n       yes nou\n  corge\n  @maybe\n    @\n    someday",
     "value": [["foo", ["bar", "qux", "yes nou"], "corge", ["maybe", [], "someday"]]]
   }, {
-    "text" : "#foo bar\n  qux corge\n @nou yes\n    maybe someday\n@not included",
+    "text" : "#foo bar\n  qux corge\n\n @nou yes\n    maybe someday\n@not included",
     "value": [["not", "included"]]
   }, {
     "text" : "> foobar",
@@ -137,8 +137,7 @@
     "value": ["foo bar\ntest uh huh"]
   }, {
     "text" : "@foo\n\n  bar\n\n  qux",
-    "value": [["foo", "bar", "qux"]],
-    "error": true
+    "value": [["foo", "bar", "qux"]]
   }, {
     "text" : "foo\n\nbar\n\nqux",
     "value": ["foo", "bar", "qux"]
@@ -219,7 +218,7 @@
     "error": true
   }, {
     "text" : "\u0020",
-    "value": ["\u0020"]
+    "value": []
   }, {
     "text" : "\u007E",
     "value": ["\u007E"]
@@ -261,18 +260,6 @@
     "error": true
   }, {
     "text" : "\uFFFF",
-    "error": true
-  }, {
-    "text" : "\u1FFFE",
-    "error": true
-  }, {
-    "text" : "\u1FFFF",
-    "error": true
-  }, {
-    "text" : "\u10FFFE",
-    "error": true
-  }, {
-    "text" : "\u10FFFF",
     "error": true
   }, {
     "text" : "\uFEFF",
