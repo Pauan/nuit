@@ -2,7 +2,7 @@
 
 // Relies upon Node.js because the browser can't load local files with XHR
 
-var requirejs = require("./r.js")
+var requirejs = require("./r")
 
 requirejs.config({
   //Pass the top-level main.js/index.js require
