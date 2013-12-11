@@ -30,8 +30,8 @@
     "text" : "@foo\n   bar\n  qux",
     "error": true
   }, {
-    "text" : "@foo @bar qux\n       yes nou\n  corge\n  @maybe\n    @\n    someday",
-    "value": [["foo", ["bar", "qux", "yes nou"], "corge", ["maybe", [], "someday"]]]
+    "text" : "@foo @bar qux\n       yes nou\n  > corge\n    testing\n  @maybe\n    @\n    \" someday",
+    "value": [["foo", ["bar", "qux", "yes nou"], "corge\ntesting", ["maybe", [], "someday"]]]
   }, {
     "text" : "#foo bar\n  qux corge\n\n @nou yes\n    maybe someday\n@not included",
     "value": [["not", "included"]]
